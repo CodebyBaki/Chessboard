@@ -1,98 +1,307 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 
 <head>
-  <title>Chessboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chess Social (React)</title>
   <style>
-    .white {
-      background-color: #f0d9b5;
-      height: 100px;
-      width: 100px;
+    :root {
+      --light: #f0d9b5;
+      --dark: #b58863;
+      --bg: #0f172a;
+      --panel: #111827;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #2563eb;
+      --ok: #16a34a;
+      --danger: #dc2626;
     }
 
-    .black {
-      height: 100px;
-      width: 100px;
-      background-color: #b58863;
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: radial-gradient(circle at top, #1e293b, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
     }
 
-    .container {
+    #root { padding: 16px; }
+
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-      grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-      width: 800px;
+      grid-template-columns: minmax(320px, 720px) minmax(260px, 1fr);
+      gap: 16px;
+    }
 
+    .panel {
+      background: color-mix(in srgb, var(--panel), transparent 8%);
+      border: 1px solid #243244;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .board-wrap { width: min(92vw, 700px); }
+    .board {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      border: 6px solid #22170f;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .sq {
+      border: 0;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      font-size: clamp(24px, 4.2vw, 44px);
+      cursor: pointer;
+      position: relative;
+      aspect-ratio: 1 / 1;
+    }
+    .light { background: var(--light); }
+    .dark { background: var(--dark); }
+    .sel { outline: 3px solid var(--ok); z-index: 1; }
+    .legal::after { content: ""; width: 26%; aspect-ratio: 1; border-radius: 50%; background: rgba(0,0,0,.25); }
+    .capture::after { content: ""; position: absolute; inset: 8%; border: 4px solid rgba(220, 38, 38, .6); border-radius: 50%; }
+
+    .topline { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .status { font-weight: 700; }
+    .muted { color: var(--muted); font-size: 14px; }
+
+    input, button, select {
+      border-radius: 8px;
+      border: 1px solid #304255;
+      background: #0b1220;
+      color: var(--text);
+      padding: 8px 10px;
+    }
+    button { cursor: pointer; background: var(--accent); border-color: #1d4ed8; }
+
+    .stack { display: grid; gap: 10px; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .links a { color: #93c5fd; font-size: 14px; }
+
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 1fr; }
+      .board-wrap { width: 100%; }
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-    <div class="black"></div>
-    <div class="white"></div>
-  </div>
+  <div id="root"></div>
+
+  <script type="module">
+    import React, { useMemo, useState, useEffect } from "https://esm.sh/react@18.3.1";
+    import { createRoot } from "https://esm.sh/react-dom@18.3.1/client";
+
+    const PIECES = {
+      white: { king: "♔", queen: "♕", rook: "♖", bishop: "♗", knight: "♘", pawn: "♙" },
+      black: { king: "♚", queen: "♛", rook: "♜", bishop: "♝", knight: "♞", pawn: "♟" }
+    };
+
+    const back = ["rook", "knight", "bishop", "queen", "king", "bishop", "knight", "rook"];
+    const newBoard = () => {
+      const b = Array.from({ length: 8 }, () => Array(8).fill(null));
+      for (let c = 0; c < 8; c++) {
+        b[0][c] = { type: back[c], color: "black", moved: false };
+        b[1][c] = { type: "pawn", color: "black", moved: false };
+        b[6][c] = { type: "pawn", color: "white", moved: false };
+        b[7][c] = { type: back[c], color: "white", moved: false };
+      }
+      return b;
+    };
+
+    const clone = b => b.map(r => r.map(p => (p ? { ...p } : null)));
+    const inb = (r, c) => r >= 0 && r < 8 && c >= 0 && c < 8;
+
+    function App() {
+      const [account, setAccount] = useState(localStorage.getItem("chess_account") || "");
+      const [savedGames, setSavedGames] = useState(JSON.parse(localStorage.getItem("chess_saves") || "{}"));
+      const [mode, setMode] = useState("local");
+      const [state, setState] = useState({ board: newBoard(), turn: "white", selected: null, legal: [], enPassant: null, over: false, message: "Welcome" });
+
+      const shareText = encodeURIComponent("Join me for a chess game!");
+      const shareUrl = encodeURIComponent(location.href);
+
+      useEffect(() => {
+        if (mode !== "computer" || state.turn !== "black" || state.over) return;
+        const timer = setTimeout(() => {
+          const moves = allMoves(state.board, "black", state.enPassant);
+          if (!moves.length) return;
+          const move = moves[Math.floor(Math.random() * moves.length)];
+          doMove(move.from, move.to);
+        }, 500);
+        return () => clearTimeout(timer);
+      }, [mode, state.turn, state.over]);
+
+      const boardView = useMemo(() => state.board, [state.board]);
+
+      function doMove(from, mv) {
+        setState(prev => {
+          const board = clone(prev.board);
+          const piece = board[from.r][from.c];
+          board[from.r][from.c] = null;
+          if (mv.enPassant) board[mv.r + (piece.color === "white" ? 1 : -1)][mv.c] = null;
+          if (mv.castle) {
+            if (mv.c === 6) { board[from.r][5] = board[from.r][7]; board[from.r][7] = null; board[from.r][5].moved = true; }
+            if (mv.c === 2) { board[from.r][3] = board[from.r][0]; board[from.r][0] = null; board[from.r][3].moved = true; }
+          }
+          board[mv.r][mv.c] = { ...piece, moved: true };
+          if (piece.type === "pawn" && (mv.r === 0 || mv.r === 7)) board[mv.r][mv.c].type = "queen";
+
+          let ep = null;
+          if (piece.type === "pawn" && Math.abs(mv.r - from.r) === 2) ep = { r: (mv.r + from.r) / 2, c: mv.c, targetColor: piece.color === "white" ? "black" : "white" };
+
+          const nextTurn = prev.turn === "white" ? "black" : "white";
+          const inCheck = isInCheck(board, nextTurn);
+          const nextHasMoves = allMoves(board, nextTurn, ep).length > 0;
+          const msg = !nextHasMoves ? (inCheck ? `Checkmate! ${prev.turn} wins.` : "Stalemate") : (inCheck ? `${nextTurn} in check` : "Move played");
+
+          return { ...prev, board, turn: nextTurn, selected: null, legal: [], enPassant: ep, over: !nextHasMoves, message: msg };
+        });
+      }
+
+      function click(r, c) {
+        if (state.over) return;
+        const p = state.board[r][c];
+        if (state.selected) {
+          const m = state.legal.find(x => x.r === r && x.c === c);
+          if (m) return doMove(state.selected, m);
+        }
+        if (p && p.color === state.turn && !(mode === "computer" && state.turn === "black")) {
+          const legal = legalMoves(state.board, r, c, state.turn, state.enPassant);
+          setState(s => ({ ...s, selected: { r, c }, legal, message: legal.length ? `Selected ${p.type}` : "No legal moves" }));
+        } else {
+          setState(s => ({ ...s, selected: null, legal: [] }));
+        }
+      }
+
+      function saveProgress() {
+        if (!account.trim()) return alert("Create or enter account name first.");
+        const next = { ...savedGames, [account]: state };
+        setSavedGames(next);
+        localStorage.setItem("chess_account", account);
+        localStorage.setItem("chess_saves", JSON.stringify(next));
+        alert("Progress saved.");
+      }
+      function loadProgress() {
+        const game = savedGames[account];
+        if (!game) return alert("No saved game for this account.");
+        setState(game);
+      }
+
+      return React.createElement("div", { className: "app" },
+        React.createElement("section", { className: "panel" },
+          React.createElement("div", { className: "topline" },
+            React.createElement("div", null,
+              React.createElement("div", { className: "status" }, state.over ? "Game Over" : `Turn: ${state.turn}`),
+              React.createElement("div", { className: "muted" }, state.message)
+            ),
+            React.createElement("div", { className: "row" },
+              React.createElement("button", { onClick: () => setState({ board: newBoard(), turn: "white", selected: null, legal: [], enPassant: null, over: false, message: "New game" }) }, "New Game"),
+              React.createElement("select", { value: mode, onChange: e => setMode(e.target.value) },
+                React.createElement("option", { value: "local" }, "2 Players (Local)"),
+                React.createElement("option", { value: "computer" }, "Play vs Computer")
+              )
+            )
+          ),
+          React.createElement("div", { className: "board-wrap" },
+            React.createElement("div", { id: "board", className: "board" },
+              boardView.map((row, r) => row.map((piece, c) => {
+                const legal = state.legal.find(m => m.r === r && m.c === c);
+                const cls = `sq ${(r + c) % 2 === 0 ? "light" : "dark"}${state.selected?.r === r && state.selected?.c === c ? " sel" : ""}${legal ? (legal.capture ? " capture" : " legal") : ""}`;
+                return React.createElement("button", { key: `${r}-${c}`, className: cls, onClick: () => click(r, c) }, piece ? PIECES[piece.color][piece.type] : "");
+              }))
+            )
+          )
+        ),
+        React.createElement("aside", { className: "panel stack" },
+          React.createElement("h3", null, "Account & Progress"),
+          React.createElement("div", { className: "row" },
+            React.createElement("input", { placeholder: "Username", value: account, onChange: e => setAccount(e.target.value) }),
+            React.createElement("button", { onClick: saveProgress }, "Save"),
+            React.createElement("button", { onClick: loadProgress }, "Load")
+          ),
+          React.createElement("div", { className: "muted" }, "Saved locally in browser for continue-later gameplay."),
+          React.createElement("h3", null, "Invite Friends"),
+          React.createElement("div", { className: "links stack" },
+            React.createElement("a", { target: "_blank", href: `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}` }, "Invite via Twitter/X"),
+            React.createElement("a", { target: "_blank", href: `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}` }, "Invite via Facebook"),
+            React.createElement("a", { target: "_blank", href: `https://wa.me/?text=${shareText}%20${shareUrl}` }, "Invite via WhatsApp")
+          ),
+          React.createElement("div", { className: "muted" }, "Social links share your game URL. Real-time online multiplayer requires a backend service.")
+        )
+      );
+    }
+
+    function allMoves(board, color, ep) {
+      const out = [];
+      for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+        if (board[r][c]?.color === color) legalMoves(board, r, c, color, ep).forEach(to => out.push({ from: { r, c }, to }));
+      }
+      return out;
+    }
+
+    function legalMoves(board, r, c, color, ep) {
+      return pseudo(board, r, c, ep).filter(m => { const t = clone(board); apply(t, { r, c }, m); return !isInCheck(t, color); });
+    }
+    function apply(board, from, mv) {
+      const p = board[from.r][from.c]; board[from.r][from.c] = null;
+      if (mv.enPassant) board[mv.r + (p.color === "white" ? 1 : -1)][mv.c] = null;
+      if (mv.castle) {
+        if (mv.c === 6) { board[from.r][5] = board[from.r][7]; board[from.r][7] = null; }
+        if (mv.c === 2) { board[from.r][3] = board[from.r][0]; board[from.r][0] = null; }
+      }
+      board[mv.r][mv.c] = { ...p, moved: true };
+    }
+    function pseudo(board, r, c, ep) {
+      const p = board[r][c]; if (!p) return []; const e = p.color === "white" ? "black" : "white"; const m = [];
+      const ray = d => { for (const [dr, dc] of d) { let nr = r + dr, nc = c + dc; while (inb(nr, nc)) { const t = board[nr][nc]; if (!t) m.push({ r: nr, c: nc, capture: false }); else { if (t.color !== p.color) m.push({ r: nr, c: nc, capture: true }); break; } nr += dr; nc += dc; } } };
+      if (p.type === "pawn") {
+        const dir = p.color === "white" ? -1 : 1; const s = p.color === "white" ? 6 : 1;
+        if (inb(r + dir, c) && !board[r + dir][c]) { m.push({ r: r + dir, c, capture: false }); if (r === s && !board[r + 2 * dir][c]) m.push({ r: r + 2 * dir, c, capture: false }); }
+        for (const dc of [-1, 1]) { const nr = r + dir, nc = c + dc; if (inb(nr, nc) && board[nr][nc]?.color === e) m.push({ r: nr, c: nc, capture: true }); }
+        if (ep && ep.targetColor === p.color && ep.r === r + dir && Math.abs(ep.c - c) === 1) m.push({ r: ep.r, c: ep.c, capture: true, enPassant: true });
+      }
+      if (p.type === "knight") [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]].forEach(([dr,dc]) => { const nr=r+dr,nc=c+dc; if(inb(nr,nc)&&(!board[nr][nc]||board[nr][nc].color!==p.color)) m.push({r:nr,c:nc,capture:!!board[nr][nc]}); });
+      if (p.type === "bishop") ray([[-1,-1],[-1,1],[1,-1],[1,1]]);
+      if (p.type === "rook") ray([[-1,0],[1,0],[0,-1],[0,1]]);
+      if (p.type === "queen") ray([[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]]);
+      if (p.type === "king") {
+        for (let dr=-1; dr<=1; dr++) for (let dc=-1; dc<=1; dc++) if (dr||dc) { const nr=r+dr,nc=c+dc; if(inb(nr,nc)&&(!board[nr][nc]||board[nr][nc].color!==p.color)) m.push({r:nr,c:nc,capture:!!board[nr][nc]}); }
+        if (!p.moved && !attacked(board, r, c, e)) {
+          const kr=board[r][7], qr=board[r][0];
+          if (kr && kr.type==="rook" && !kr.moved && !board[r][5] && !board[r][6] && !attacked(board,r,5,e) && !attacked(board,r,6,e)) m.push({r,c:6,castle:true,capture:false});
+          if (qr && qr.type==="rook" && !qr.moved && !board[r][1] && !board[r][2] && !board[r][3] && !attacked(board,r,2,e) && !attacked(board,r,3,e)) m.push({r,c:2,castle:true,capture:false});
+        }
+      }
+      return m;
+    }
+    function attacked(board, r, c, by) {
+      for (let rr=0; rr<8; rr++) for (let cc=0; cc<8; cc++) {
+        const p = board[rr][cc]; if (!p || p.color!==by) continue;
+        if (p.type==="pawn") { const d=by==="white"?-1:1; if (rr+d===r && (cc+1===c||cc-1===c)) return true; continue; }
+        if (p.type==="king") { if (Math.max(Math.abs(rr-r),Math.abs(cc-c))===1) return true; continue; }
+        if (pseudo(board, rr, cc, null).some(m => m.r===r && m.c===c)) return true;
+      }
+      return false;
+    }
+    function isInCheck(board, color) {
+      for (let r=0;r<8;r++) for (let c=0;c<8;c++) if (board[r][c]?.type==="king" && board[r][c].color===color) return attacked(board, r, c, color==="white"?"black":"white");
+      return false;
+    }
+
+    createRoot(document.getElementById("root")).render(React.createElement(App));
+  </script>
 </body>
 
 </html>
