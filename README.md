@@ -16,6 +16,3 @@ A browser-based chess game built in plain HTML/CSS/JavaScript.
   - Pawn promotion (auto-promotes to queen)
 - New Game reset button
 
-## Run
-
-Open `index.html` in any modern browser.
